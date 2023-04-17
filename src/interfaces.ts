@@ -19,12 +19,12 @@ interface IInfoDevelopers {
     developerSince: Date,
     preferredOS: string,
     developerId?: number,
-}
+};
 
 interface IInfoDeveloper {
     since: Date,
     preferreds: "Windows" | "Linux" | "MacOS",
-}
+};
 
 interface IProject {
     name: string,
@@ -50,14 +50,7 @@ interface IUpdateProject {
     startDate?: Date;
     endDate?: Date | null;
     developerId?: number;
-}
-
-interface ITechnology {
-    id: number;
-    name: 'JavaScript' | 'Python' | 'React' | 'Express.js' | 'HTML' | 'CSS' | 'Django' | 'PostgreSQL' | 'MongoDB';
 };
-
-type TProjetcTechnology = Omit<IProject | ITechnology, "id">;
 
 interface IProjectTechnology {
     projId: number;
@@ -71,6 +64,18 @@ interface IProjectTechnology {
     techId: number | null;
     techName: string | null;
 }; 
+
+interface ITechnology {
+    id?: number;
+    name: string;
+};
+
+interface IProjetcTechnology {
+    id?: number;
+    addedIn: Date;
+    technologyId?: number;
+    projectId?: number;
+};
   
-export { IDevelopers, TDeveloper, IDeveloperInfo, IInfoDevelopers, IInfoDeveloper, IProject, TProject, TProjectRes, TProjRes, IUpdateProject, ITechnology, IProjectTechnology};
+export { IDevelopers, TDeveloper, IDeveloperInfo, IInfoDevelopers, IInfoDeveloper, IProject, TProject, TProjectRes, TProjRes, IUpdateProject, IProjectTechnology, ITechnology, IProjetcTechnology };
   

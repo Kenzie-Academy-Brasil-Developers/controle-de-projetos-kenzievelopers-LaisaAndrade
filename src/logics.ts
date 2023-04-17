@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import format from "pg-format";
 import { QueryConfig, QueryResult } from "pg";
 import { client } from "./database";
-import { IDeveloperInfo, IDevelopers, IInfoDevelopers, IProject, IProjectTechnology, IUpdateProject, TDeveloper, TProjRes, TProject, TProjectRes } from "./interfaces";
+import { IDeveloperInfo, IDevelopers, IInfoDevelopers, IProject, IProjectTechnology, ITechnology, IUpdateProject, TDeveloper, TProjRes, TProject, TProjectRes } from "./interfaces";
 
 const createDevelopers = async (req: Request, res: Response): Promise<Response> => {
   const developerData: TDeveloper = req.body;
@@ -217,4 +217,50 @@ const deleteProjects = async (req: Request, res: Response): Promise<Response> =>
   return res.status(204).send();
 };
 
-export { createDevelopers, listDevelopers, updateDevelopers, deleteDevelopers, createInfo, createProject, listProjects, updateProjects, deleteProjects };
+const createTechnology = async (req: Request, res: Response): Promise<Response> => {
+  const id: number = parseInt(req.params.id);
+  const techId: number = Number(req.localStorageId.techId);
+  const date: Date = new Date();
+  const queryString: string = 
+  `
+    INSERT INTO
+      project_technology ("addedIn", "technologyId", "projectId")
+    VALUES
+      ($1, $2, $3)
+    RETURNING *;
+  `;
+  const config: QueryConfig = {
+    text: queryString,
+    values: [date, techId, id],
+  };
+  await client.query(config)
+  const addTechnology: string =
+  `
+    SELECT
+      tech."id" AS "techId",
+      tech."name" AS "techName",
+      proj."id" AS "projectId",
+      proj."description" AS "projDescription",
+      proj. "estimatedTime" AS "projEstimatedTime",
+      proj. "repository" AS "projRepository",
+      proj. "startDate" AS "projStartDate",
+      proj. "endDate" AS "projEndDate"
+    FROM
+      technology tec
+    LEFT JOIN
+      "project_technology" "projTech" ON "projTech"."technologyId" = tec."id"
+    LEFT JOIN
+      project proj ON "projTech"."projId" = proj."id"
+    WHERE
+      proj."id" = $1;
+  `;
+  const queryConfig: QueryConfig = {
+    text: addTechnology,
+    values: [id],
+  };
+  const queryResult: QueryResult<ITechnology> = await client.query(queryConfig); 
+
+  return res.status(201).json(queryResult.rows[0]);
+};
+
+export { createDevelopers, listDevelopers, updateDevelopers, deleteDevelopers, createInfo, createProject, listProjects, updateProjects, deleteProjects, createTechnology };
