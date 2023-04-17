@@ -219,7 +219,7 @@ const deleteProjects = async (req: Request, res: Response): Promise<Response> =>
 
 const createTechnology = async (req: Request, res: Response): Promise<Response> => {
   const id: number = parseInt(req.params.id);
-  const techId: number = Number(req.localStorageId.techId);
+  // const techId: number = Number(req.localStorageId.techId);
   const date: Date = new Date();
   const queryString: string = 
   `
@@ -231,7 +231,7 @@ const createTechnology = async (req: Request, res: Response): Promise<Response> 
   `;
   const config: QueryConfig = {
     text: queryString,
-    values: [date, techId, id],
+    values: [date, id],
   };
   await client.query(config)
   const addTechnology: string =
@@ -265,7 +265,7 @@ const createTechnology = async (req: Request, res: Response): Promise<Response> 
 
 const deleteTechnology = async (req: Request, res: Response): Promise<Response> => {
   const id: number = parseInt(req.params.id);
-  const techId: number = Number(req.idTechDelete.deleteTech);
+  // const techId: number = Number(req.idTechDelete.deleteTech);
   const queryString: string = 
   `
     DELETE
@@ -276,7 +276,7 @@ const deleteTechnology = async (req: Request, res: Response): Promise<Response> 
   `;
   const queryConfig: QueryConfig = {
     text: queryString,
-    values: [techId, id],
+    values: [ id],
   };
   await client.query(queryConfig);
 

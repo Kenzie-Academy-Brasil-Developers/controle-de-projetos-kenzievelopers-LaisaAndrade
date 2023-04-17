@@ -157,11 +157,11 @@ const checkTechExists = async (req: Request, res: Response, next: NextFunction):
   if (queryResult.rowCount > 0) {
     const result = queryResult.rows[0];
 
-    if (result.id !== undefined || result.id !== null) {
-      req.localStorageId = {
-        techId: Number(result.id)
-      };
-    };
+    // if (result.id !== undefined || result.id !== null) {
+    //   req.localStorageId = {
+    //     techId: Number(result.id)
+    //   };
+    // };
   } else {
     return res.status(404).json({
       "message": "Technology not supported.",
@@ -199,9 +199,9 @@ const checkIdTech = async (req: Request, res: Response, next: NextFunction): Pro
   };
   const queryResult: QueryResult<ITechnology> = await client.query(queryConfig);
 
-  req.idTechDelete = {
-    deleteTech: Number(queryResult.rows[0].id)
-  };
+  // req.idTechDelete = {
+  //   deleteTech: Number(queryResult.rows[0].id)
+  // };
 
   return next();
 };
