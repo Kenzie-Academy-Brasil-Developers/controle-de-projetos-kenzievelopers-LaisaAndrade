@@ -45,36 +45,36 @@ type TProjRes = Omit<TProjectRes, "endDate">;
 interface IUpdateProject {
     name?: string,
     description?: string,
-    estimatedTime?: string;
-    repository?: string;
-    startDate?: Date;
-    endDate?: Date | null;
-    developerId?: number;
+    estimatedTime?: string,
+    repository?: string,
+    startDate?: Date,
+    endDate?: Date | null,
+    developerId?: number,
 };
 
 interface IProjectTechnology {
-    projId: number;
-    projName: string;
-    projDescription: string;
-    projEstimatedTime: string;
-    projRepository: string;
-    projStartDate: Date;
-    projEndDate: Date | null;
-    projDeveloperId: number;
-    techId: number | null;
-    techName: string | null;
+    projId: number,
+    projName: string,
+    projDescription: string,
+    projEstimatedTime: string,
+    projRepository: string,
+    projStartDate: Date,
+    projEndDate: Date | null,
+    projDeveloperId: number,
+    techId: number | null,
+    techName: string | null,
 }; 
 
 interface ITechnology {
-    id?: number;
-    name: string;
+    id?: number,
+    name: string,
 };
 
 interface IProjetcTechnology {
-    id?: number;
-    addedIn: Date;
-    technologyId?: number;
-    projectId?: number;
+    id?: number,
+    addedIn: Date,
+    technologyId?: number,
+    projectId?: number,
 };
   
 export { IDevelopers, TDeveloper, IDeveloperInfo, IInfoDevelopers, IInfoDeveloper, IProject, TProject, TProjectRes, TProjRes, IUpdateProject, IProjectTechnology, ITechnology, IProjetcTechnology };
