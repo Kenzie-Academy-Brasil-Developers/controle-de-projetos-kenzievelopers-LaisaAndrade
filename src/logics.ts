@@ -239,7 +239,7 @@ const createTechnology = async (req: Request, res: Response): Promise<Response> 
     SELECT
       tech."id" AS "techId",
       tech."name" AS "techName",
-      proj."id" AS "projectId",
+      proj."id" AS "projId",
       proj."description" AS "projDescription",
       proj. "estimatedTime" AS "projEstimatedTime",
       proj. "repository" AS "projRepository",
@@ -263,4 +263,24 @@ const createTechnology = async (req: Request, res: Response): Promise<Response> 
   return res.status(201).json(queryResult.rows[0]);
 };
 
-export { createDevelopers, listDevelopers, updateDevelopers, deleteDevelopers, createInfo, createProject, listProjects, updateProjects, deleteProjects, createTechnology };
+const deleteTechnology = async (req: Request, res: Response): Promise<Response> => {
+  const id: number = parseInt(req.params.id);
+  const techId: number = Number(req.idTechDelete.deleteTech);
+  const queryString: string = 
+  `
+    DELETE
+      "project_technology" "projTech"
+    WHERE
+      "projTech"."techId" = $1 AND "projTech"."projectId" = $2
+    RETURNING *;
+  `;
+  const queryConfig: QueryConfig = {
+    text: queryString,
+    values: [techId, id],
+  };
+  await client.query(queryConfig);
+
+  return res.status(204).send();
+};
+
+export { createDevelopers, listDevelopers, updateDevelopers, deleteDevelopers, createInfo, createProject, listProjects, updateProjects, deleteProjects, createTechnology, deleteTechnology };

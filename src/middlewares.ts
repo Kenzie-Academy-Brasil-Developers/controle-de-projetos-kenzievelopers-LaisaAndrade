@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { QueryConfig, QueryResult } from "pg";
 import { client } from "./database";
-import { IDevelopers, IProject, IProjectTechnology, TProject } from "./interfaces";
+import { IDevelopers, IProject, IProjectTechnology, ITechnology, TProject } from "./interfaces";
 
 const checkEmailExists = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
   let email = req.body.email;
@@ -131,4 +131,79 @@ const checkIdProject = async (req: Request, res: Response, next: NextFunction): 
   return next();
 };
 
-export { checkEmailExists, checkDeveloperExists, checkInfoExists, checkIdExists, checkIdProject };
+const checkTechExists = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+  const tech: ITechnology = req.body;
+
+  if (!tech.name) {
+    return res.status(409).json({
+      message: "This technology is already associated with the project"
+    });
+  };
+  const queryString: string = 
+  `
+    SELECT
+      *
+    FROM
+      technology
+    WHERE
+      technology.name = $1;
+  `;
+  const queryConfig: QueryConfig = {
+    text: queryString,
+    values: [tech.name],
+  };
+  const queryResult: QueryResult<ITechnology> = await client.query(queryConfig);
+
+  if (queryResult.rowCount > 0) {
+    const result = queryResult.rows[0];
+
+    if (result.id !== undefined || result.id !== null) {
+      req.localStorageId = {
+        techId: Number(result.id)
+      };
+    };
+  } else {
+    return res.status(404).json({
+      "message": "Technology not supported.",
+      "options": [
+        "JavaScript",
+        "Python",
+        "React",
+        "Express.js",
+        "HTML",
+        "CSS",
+        "Django",
+        "PostgreSQL",
+        "MongoDB"
+      ]
+    });
+  };
+
+  return next();
+};
+
+const checkIdTech = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+  const name = req.params.name;
+  const queryString: string = 
+  `
+    SELECT
+      *
+    FROM
+      technology
+    WHERE
+      technology.name = $1;
+  `;
+  const queryConfig: QueryConfig = {
+    text: queryString,
+    values: [name],
+  };
+  const queryResult: QueryResult<ITechnology> = await client.query(queryConfig);
+
+  req.idTechDelete = {
+    deleteTech: Number(queryResult.rows[0].id)
+  };
+
+  return next();
+};
+
+export { checkEmailExists, checkDeveloperExists, checkInfoExists, checkIdExists, checkIdProject, checkTechExists, checkIdTech };
