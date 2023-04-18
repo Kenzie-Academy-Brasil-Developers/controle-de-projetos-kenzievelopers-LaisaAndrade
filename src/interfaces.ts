@@ -7,7 +7,7 @@ interface IDevelopers {
 type TDeveloper = Omit<IDevelopers, "id">;
 
 interface IDeveloperInfo {
-    devId: number,
+    developerId: number,
     devName: string,
     devEmail: string,
     infoSince?: Date | null,
@@ -42,6 +42,15 @@ type TProjectRes = IProject & { id: number };
 
 type TProjRes = Omit<TProjectRes, "endDate">;
 
+type TOmitId = Omit<IProject, "id">;
+
+interface IProjTech extends TOmitId{
+    techId: number | null,
+    techName: string | null,
+}
+
+interface IDevProj extends IInfoDeveloper, IProjTech {};
+
 interface IUpdateProject {
     name?: string,
     description?: string,
@@ -52,7 +61,7 @@ interface IUpdateProject {
     developerId?: number,
 };
 
-interface IProjectTechnology {
+interface IProjectTechnologies {
     projId: number,
     projName: string,
     projDescription: string,
@@ -70,12 +79,13 @@ interface ITechnology {
     name: string,
 };
 
+type TTechs = ITechnology;
+
 interface IProjetcTechnology {
-    id?: number,
     addedIn: Date,
-    technologyId?: number,
-    projectId?: number,
+    technologyId: number,
+    projectId: number,
 };
   
-export { IDevelopers, TDeveloper, IDeveloperInfo, IInfoDevelopers, IInfoDeveloper, IProject, TProject, TProjectRes, TProjRes, IUpdateProject, IProjectTechnology, ITechnology, IProjetcTechnology };
+export { IDevelopers, TDeveloper, IDeveloperInfo, IInfoDevelopers, IInfoDeveloper, IProject, TProject, TProjectRes, TProjRes, IDevProj, IUpdateProject, IProjectTechnologies, ITechnology, TTechs, IProjetcTechnology };
   
