@@ -2,9 +2,25 @@ import { Request, Response } from "express";
 import format from "pg-format";
 import { QueryConfig, QueryResult } from "pg";
 import { client } from "./database";
-import { IDeveloperInfo, IDevelopers, IInfoDevelopers, IProject, IProjectTechnologies, IProjetcTechnology, ITechnology, IUpdateProject, TDeveloper, TProjRes, TProject, TProjectRes } from "./interfaces";
+import {
+  IDeveloperInfo,
+  IDevelopers,
+  IInfoDevelopers,
+  IProject,
+  IProjectTechnologies,
+  IProjetcTechnology,
+  ITechnology,
+  IUpdateProject,
+  TDeveloper,
+  TProjRes,
+  TProject,
+  TProjectRes,
+} from "./interfaces";
 
-const createDevelopers = async (req: Request, res: Response): Promise<Response> => {
+const createDevelopers = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
   const developerData: TDeveloper = req.body;
   const queryString: string = format(
     `
@@ -22,29 +38,36 @@ const createDevelopers = async (req: Request, res: Response): Promise<Response> 
   return res.status(201).json(queryResult.rows[0]);
 };
 
-const listDevelopers = async (req: Request, res: Response): Promise<Response> => {
+const listDevelopers = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
   const { id } = req.params;
-  const queryString: string = 
-  `
-    SELECT
-      dev. "id" AS "developerId",
-      dev. "name" AS "devName",
-      dev. "email" AS "devEmail",
-      developer_infos. "developerSince" AS "infoSince",
-      developer_infos. "preferredOS" AS "infoPreferred"
-    FROM
-      developer_infos "devInf"
-    RIGHT JOIN
-      developers dev ON "devInf"."developerId" = dev."id"
-    WHERE
-      dev. "id"=$1;
+  const queryString: string = `
+  SELECT
+  dev."id" AS "developerId",
+  dev."name" AS "developerName",
+  dev."email" AS "developerEmail",
+  "devInf"."developerSince" AS "developerInfoDeveloperSince",
+  "devInf"."preferredOS" AS "developerInfoPreferredOS"
+  FROM
+    developer_infos "devInf"
+  RIGHT JOIN
+    developers dev ON "devInf"."developerId" = dev."id"
+  WHERE dev."id"=$1;
   `;
-  const queryResult:QueryResult<IDeveloperInfo> = await client.query(queryString, [id]);
+  const queryResult: QueryResult<IDeveloperInfo> = await client.query(
+    queryString,
+    [id]
+  );
 
   return res.json(queryResult.rows[0]);
 };
 
-const updateDevelopers = async (req: Request, res: Response): Promise<Response> => {
+const updateDevelopers = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
   const developerData: TDeveloper = req.body;
   const id: number = parseInt(req.params.id);
   const queryString: string = format(
@@ -68,10 +91,12 @@ const updateDevelopers = async (req: Request, res: Response): Promise<Response> 
   return res.json(queryResult.rows[0]);
 };
 
-const deleteDevelopers = async (req: Request, res: Response): Promise<Response> => {
+const deleteDevelopers = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
   const id: number = parseInt(req.params.id);
-  const queryString: string = 
-  `
+  const queryString: string = `
     DELETE FROM
       developers
     WHERE
@@ -91,7 +116,7 @@ const createInfo = async (req: Request, res: Response): Promise<Response> => {
     const id = parseInt(req.params.id);
     const infoData = {
       developerSince: req.body.developerSince,
-      preferresOS: req.body.preferredOS,
+      preferredOS: req.body.preferredOS,
       developerId: id,
     };
     const queryString: string = format(
@@ -105,32 +130,38 @@ const createInfo = async (req: Request, res: Response): Promise<Response> => {
       Object.keys(infoData),
       Object.values(infoData)
     );
-    const queryResult: QueryResult<IInfoDevelopers> = await client.query(queryString);
+    const queryResult: QueryResult<IInfoDevelopers> = await client.query(
+      queryString
+    );
 
     return res.status(201).json(queryResult.rows[0]);
   } catch (error) {
-
     if (error instanceof Error) {
       const infoData = {
         preferredOS: req.body.preferredOS,
       };
 
       if (infoData.preferredOS !== "Windows" || "Linux" || "MacOS") {
+        console.log("flavia");
+
         return res.status(400).json({
           message: "Invalid OS option.",
-          options: ["Windows", "Linux", "MacOS"]
+          options: ["Windows", "Linux", "MacOS"],
         });
-      };
-    };
+      }
+    }
     return res.status(500).json({
-      message: error
+      message: error,
     });
-  };
+  }
 };
 
-const createProject = async (req: Request, res: Response): Promise<Response> => {
+const createProject = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
   const projectData: IProject | TProject = req.body;
-  const queryString: string = format (
+  const queryString: string = format(
     `
       INSERT INTO
         projects(%I)
@@ -141,44 +172,52 @@ const createProject = async (req: Request, res: Response): Promise<Response> => 
     Object.keys(projectData),
     Object.values(projectData)
   );
-  const queryResult: QueryResult<TProjectRes | TProjRes> = await client.query(queryString);
+  const queryResult: QueryResult<TProjectRes | TProjRes> = await client.query(
+    queryString
+  );
 
   return res.status(201).json(queryResult.rows[0]);
 };
 
 const listProjects = async (req: Request, res: Response): Promise<Response> => {
   const { id } = req.params;
-  const queryString: string = 
-  `
+
+  const queryString: string = `
     SELECT
-      proj. "id" AS "projId",
-      proj. "name" AS "projName",
-      proj. "description" AS "projDescription",
-      proj. "estimatedTime" AS "projEstimatedTime",
-      proj. "repository" AS "projRepository",
-      proj. "startDate" AS "projStartDate",
-      proj. "endDate" AS "projEndDate",
-      proj. "developerId" AS "projDeveloperId",
-      tec. "id" AS "techId",
-      tec. "name" AS "techName"
+      proj."id" AS "projectId",
+      proj."name" AS "projectName",
+      proj."description" AS "projectDescription",
+      proj."estimatedTime" AS "projectEstimatedTime",
+      proj."repository" AS "projectRepository",
+      proj."startDate" AS "projectStartDate",
+      proj."endDate" AS "projectEndDate",
+      proj."developerId" AS "projectDeveloperId",
+      tec.id AS "technologyId",
+      tec.name AS "technologyName"
     FROM
-      "project_technologies" "projTech"
-    RIGHT JOIN
-      technologies tec ON tec.id = "projTech"."techId"
-    RICHT JOIN 
-      project proj ON "projTech"."projId" = proj."id"
-    WHERE
-      proj. "id" = $1;
+      projects_technologies projtec
+      RIGHT JOIN technologies tec ON tec.id = projtec."technologyId"
+      RIGHT JOIN projects proj ON projtec."projectId" = proj."id"
+    WHERE proj."id" = $1;
   `;
-  const queryResult: QueryResult<IProjectTechnologies> = await client.query<IProjectTechnologies>(queryString, [id]);
+  console.log("laisa", queryString);
+  
+  const queryResult: QueryResult<IProjectTechnologies> =
+    await client.query<IProjectTechnologies>(queryString, [id]);
+console.log("flavia");
+console.log(queryResult);
+
 
   return res.status(200).json(queryResult.rows);
 };
 
-const updateProjects = async (req: Request, res: Response): Promise<Response> => {
+const updateProjects = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
   const projectData: IUpdateProject = req.body;
   const id: number = parseInt(req.params.id);
-  const queryString: string = format (
+  const queryString: string = format(
     `
       UPDATE
         projects
@@ -186,7 +225,7 @@ const updateProjects = async (req: Request, res: Response): Promise<Response> =>
       WHERE
         id = $1
       RETURNING *;
-    `, 
+    `,
     Object.keys(projectData),
     Object.values(projectData)
   );
@@ -194,15 +233,19 @@ const updateProjects = async (req: Request, res: Response): Promise<Response> =>
     text: queryString,
     values: [id],
   };
-  const queryResult: QueryResult<TProjRes | TProjectRes> = await client.query(queryConfig);
+  const queryResult: QueryResult<TProjRes | TProjectRes> = await client.query(
+    queryConfig
+  );
 
   return res.json(queryResult.rows[0]);
 };
 
-const deleteProjects = async (req: Request, res: Response): Promise<Response> => {
+const deleteProjects = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
   const id: number = parseInt(req.params.id);
-  const queryString: string = 
-  `
+  const queryString: string = `
     DELETE FROM
       projects
     WHERE
@@ -217,18 +260,21 @@ const deleteProjects = async (req: Request, res: Response): Promise<Response> =>
   return res.status(204).send();
 };
 
-const createTechnology = async (req: Request, res: Response): Promise<Response> => {
+const createTechnology = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
   const id: number = parseInt(req.params.id);
   const date: Date = new Date();
   const techId: IProjetcTechnology = {
     addedIn: date,
     projectId: id,
-    technologyId: res.locals.tech.techId
-  }
-  const queryString: string = format (
+    technologyId: res.locals.tech.idTech,
+  };
+  const queryString: string = format(
     `
       INSERT INTO
-        project_technologies(%I)
+        projects_technologies(%I)
       VALUES
         (%L)
       RETURNING *;
@@ -237,23 +283,22 @@ const createTechnology = async (req: Request, res: Response): Promise<Response> 
     Object.values(techId)
   );
   await client.query(queryString);
-  const addTechnology: string =
-  `
+  const addTechnology: string = `
     SELECT
-      tech."id" AS "techId",
-      tech."name" AS "techName",
-      proj."id" AS "projId",
-      proj."description" AS "projDescription",
-      proj. "estimatedTime" AS "projEstimatedTime",
-      proj. "repository" AS "projRepository",
-      proj. "startDate" AS "projStartDate",
-      proj. "endDate" AS "projEndDate"
+      tech."id" AS "technologyId",
+      tech."name" AS "technologyName",
+      proj."id" AS "projectId",
+      proj."description" AS "projectDescription",
+      proj. "estimatedTime" AS "projectEstimatedTime",
+      proj. "repository" AS "projectRepository",
+      proj. "startDate" AS "projectStartDate",
+      proj. "endDate" AS "projectEndDate"
     FROM
-      technology tec
+    technologies tec
     LEFT JOIN
-      "project_technologies" "projTech" ON "projTech"."technologyId" = tec."id"
+      "projects_technologies" "projTech" ON "projTech"."technologyId" = tec."id"
     LEFT JOIN
-      project proj ON "projTech"."projId" = proj."id"
+      projects proj ON "projTech"."projectId" = proj."id"
     WHERE
       proj."id" = $1;
   `;
@@ -261,20 +306,24 @@ const createTechnology = async (req: Request, res: Response): Promise<Response> 
     text: addTechnology,
     values: [techId.projectId],
   };
-  const queryResult: QueryResult<IProjectTechnologies> = await client.query(queryConfig); 
+  const queryResult: QueryResult<IProjectTechnologies> = await client.query(
+    queryConfig
+  );
 
   return res.status(201).json(queryResult.rows[0]);
 };
 
-const deleteTechnology = async (req: Request, res: Response): Promise<Response> => {
+const deleteTechnology = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
   const id: number = parseInt(req.params.id);
   const techId: number = Number(res.locals.queryResult);
-  const queryString: string = 
-  `
+  const queryString: string = `
     DELETE FROM
-      "project_technologies" "projTech"
+      "projects_technologies" "projTech"
     WHERE
-      "projTech"."techId" = $1 AND "projTech"."projectId" = $2
+      "projTech"."technologyId" = $1 AND "projTech"."projectId" = $2
     RETURNING *;
   `;
   const queryConfig: QueryConfig = {
@@ -285,9 +334,21 @@ const deleteTechnology = async (req: Request, res: Response): Promise<Response> 
 
   if (queryResult.rowCount === 0) {
     return res.status(400).json({ message: "Project not found." });
-  };
+  }
 
   return res.status(204).send();
 };
 
-export { createDevelopers, listDevelopers, updateDevelopers, deleteDevelopers, createInfo, createProject, listProjects, updateProjects, deleteProjects, createTechnology, deleteTechnology };
+export {
+  createDevelopers,
+  listDevelopers,
+  updateDevelopers,
+  deleteDevelopers,
+  createInfo,
+  createProject,
+  listProjects,
+  updateProjects,
+  deleteProjects,
+  createTechnology,
+  deleteTechnology,
+};

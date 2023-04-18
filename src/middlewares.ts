@@ -1,12 +1,22 @@
 import { Request, Response, NextFunction } from "express";
 import { QueryConfig, QueryResult } from "pg";
 import { client } from "./database";
-import { IDevelopers, IInfoDevelopers, IProjectTechnologies, IProjetcTechnology, ITechnology, TTechs } from "./interfaces";
+import {
+  IDevelopers,
+  IInfoDevelopers,
+  IProjectTechnologies,
+  IProjetcTechnology,
+  ITechnology,
+  TTechs,
+} from "./interfaces";
 
-const checkEmailExists = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+const checkEmailExists = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
   let email = req.body.email;
-  const queryString: string = 
-  `
+  const queryString: string = `
     SELECT 
       *
     FROM 
@@ -19,18 +29,21 @@ const checkEmailExists = async (req: Request, res: Response, next: NextFunction)
     values: [email],
   };
   const queryResult: QueryResult<IDevelopers> = await client.query(queryConfig);
-  
+
   if (queryResult.rowCount > 0) {
     return res.status(409).json({ message: "Email already exists." });
   }
-  
+
   return next();
 };
 
-const checkDeveloperExists = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+const checkDeveloperExists = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
   const id = req.params.id;
-  const queryString: string = 
-  `
+  const queryString: string = `
     SELECT
       *
     FROM
@@ -47,17 +60,20 @@ const checkDeveloperExists = async (req: Request, res: Response, next: NextFunct
 
   if (queryResult.rowCount === 0) {
     return res.status(404).json({ message: "Developer not found." });
-  };
+  }
 
   res.locals.dev = dev;
 
   return next();
 };
 
-const checkInfoExists = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+const checkInfoExists = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
   const id = req.params.id;
-  const queryString: string = 
-  `
+  const queryString: string = `
     SELECT
       *
     FROM
@@ -69,25 +85,30 @@ const checkInfoExists = async (req: Request, res: Response, next: NextFunction):
     text: queryString,
     values: [id],
   };
-  const queryResult: QueryResult<IInfoDevelopers> = await client.query(queryConfig);
+  const queryResult: QueryResult<IInfoDevelopers> = await client.query(
+    queryConfig
+  );
 
   if (queryResult.rowCount >= 1) {
     return res.status(409).json({ message: "Developer info already exists." });
-  };
+  }
 
   return next();
 };
 
-const checkIdExists = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+const checkIdExists = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
   let id: number = parseInt(req.body.id);
 
   if (req.route.path === "/projects" && req.method === "POST") {
     id = req.body.developerId;
   } else if (req.route.path === "/projects/:id" && req.method === "PATCH") {
     id = req.body.developerId;
-  };
-  const queryString: string =
-  `
+  }
+  const queryString: string = `
     SELECT
       *
     FROM
@@ -103,16 +124,19 @@ const checkIdExists = async (req: Request, res: Response, next: NextFunction): P
 
   if (queryResult.rowCount === 0) {
     return res.status(404).json({ message: "Developer not found." });
-  };
+  }
   res.locals.project = queryResult.rows[0];
-  
+
   return next();
 };
 
-const checkIdProject = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+const checkIdProject = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
   const id = req.params.id;
-  const queryString: string = 
-  `
+  const queryString: string = `
     SELECT
       *
     FROM
@@ -124,19 +148,24 @@ const checkIdProject = async (req: Request, res: Response, next: NextFunction): 
     text: queryString,
     values: [id],
   };
-  const queryResult: QueryResult<IProjectTechnologies> = await client.query(queryConfig);
+  const queryResult: QueryResult<IProjectTechnologies> = await client.query(
+    queryConfig
+  );
 
   if (queryResult.rowCount === 0) {
     return res.status(404).json({ message: "Project not found." });
-  };
+  }
 
   return next();
 };
 
-const checkTechExists = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+const checkTechExists = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
   const tech: ITechnology = req.body;
-  const queryString: string = 
-  `
+  const queryString: string = `
     SELECT
       *
     FROM
@@ -153,12 +182,12 @@ const checkTechExists = async (req: Request, res: Response, next: NextFunction):
   if (queryResult.rowCount > 0) {
     const result = queryResult.rows[0];
     res.locals.tech = {
-      idTech: Number(result.id)
+      idTech: Number(result.id),
     };
   } else {
     return res.status(400).json({
-      "message": "Technology not supported.",
-      "options": [
+      message: "Technology not supported.",
+      options: [
         "JavaScript",
         "Python",
         "React",
@@ -167,19 +196,22 @@ const checkTechExists = async (req: Request, res: Response, next: NextFunction):
         "CSS",
         "Django",
         "PostgreSQL",
-        "MongoDB"
-      ]
+        "MongoDB",
+      ],
     });
-  };
+  }
 
   return next();
 };
 
-const checkNameExists = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+const checkNameExists = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
   const name: string = req.body.name;
   const projId: number = parseInt(req.params.id);
-  const queryString: string = 
-  `
+  const queryString: string = `
     SELECT
       *
     FROM
@@ -193,8 +225,7 @@ const checkNameExists = async (req: Request, res: Response, next: NextFunction):
   };
   const queryResult: QueryResult<ITechnology> = await client.query(queryConfig);
   const idTech: number | undefined = queryResult.rows[0].id;
-  const queryStringg: string =
-  `
+  const queryStringg: string = `
     SELECT
       *
     FROM
@@ -208,23 +239,30 @@ const checkNameExists = async (req: Request, res: Response, next: NextFunction):
     text: queryStringg,
     values: [idTech, projId],
   };
-  const queryResultt: QueryResult<IProjetcTechnology> = await client.query(queryConfigg);
+  const queryResultt: QueryResult<IProjetcTechnology> = await client.query(
+    queryConfigg
+  );
 
   if (queryResultt.rowCount > 0) {
-    return res.status(409).json("This technology is already associated with the project")
+    return res
+      .status(409)
+      .json("This technology is already associated with the project");
   }
 
   return next();
 };
 
-const checkNameDelete = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+const checkNameDelete = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
   let techReq = req.body;
 
   if (Object.keys(techReq).length === 0) {
     techReq = req.params;
-  };
-  const queryString =
-  `
+  }
+  const queryString = `
     SELECT 
       *
     FROM
@@ -239,8 +277,7 @@ const checkNameDelete = async (req: Request, res: Response, next: NextFunction):
   const queryResult = await client.query(queryConfig);
 
   if (queryResult.rowCount <= 0) {
-    const queryStringg = 
-    `
+    const queryStringg = `
       SELECT
         *
       FROM
@@ -251,14 +288,23 @@ const checkNameDelete = async (req: Request, res: Response, next: NextFunction):
       return event.name;
     });
 
-    return res.status(400).json({ 
-      message: "Technology not supported.", 
+    return res.status(400).json({
+      message: "Technology not supported.",
       options: assessment,
     });
-  };
+  }
   res.locals.queryResultt = queryResult.rows[0].id;
 
   return next();
 };
 
-export { checkEmailExists, checkDeveloperExists, checkInfoExists, checkIdExists, checkIdProject, checkTechExists, checkNameExists, checkNameDelete };
+export {
+  checkEmailExists,
+  checkDeveloperExists,
+  checkInfoExists,
+  checkIdExists,
+  checkIdProject,
+  checkTechExists,
+  checkNameExists,
+  checkNameDelete,
+};
