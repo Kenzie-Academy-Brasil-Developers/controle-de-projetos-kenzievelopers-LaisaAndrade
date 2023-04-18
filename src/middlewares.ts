@@ -244,9 +244,7 @@ const checkNameExists = async (
   );
 
   if (queryResultt.rowCount > 0) {
-    return res
-      .status(409)
-      .json("This technology is already associated with the project");
+    return res.status(409).json({ message: "This technology is already associated with the project" });
   }
 
   return next();
@@ -293,7 +291,7 @@ const checkNameDelete = async (
       options: assessment,
     });
   }
-  res.locals.queryResultt = queryResult.rows[0].id;
+  res.locals.queryResult = queryResult.rows[0].id;
 
   return next();
 };

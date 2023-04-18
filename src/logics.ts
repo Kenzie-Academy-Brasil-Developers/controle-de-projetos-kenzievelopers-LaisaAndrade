@@ -142,7 +142,6 @@ const createInfo = async (req: Request, res: Response): Promise<Response> => {
       };
 
       if (infoData.preferredOS !== "Windows" || "Linux" || "MacOS") {
-        console.log("flavia");
 
         return res.status(400).json({
           message: "Invalid OS option.",
@@ -181,7 +180,6 @@ const createProject = async (
 
 const listProjects = async (req: Request, res: Response): Promise<Response> => {
   const { id } = req.params;
-
   const queryString: string = `
     SELECT
       proj."id" AS "projectId",
@@ -195,18 +193,13 @@ const listProjects = async (req: Request, res: Response): Promise<Response> => {
       tec.id AS "technologyId",
       tec.name AS "technologyName"
     FROM
-      projects_technologies projtec
-      RIGHT JOIN technologies tec ON tec.id = projtec."technologyId"
-      RIGHT JOIN projects proj ON projtec."projectId" = proj."id"
+      projects_technologies projTech
+      RIGHT JOIN technologies tec ON tec.id = projTech."technologyId"
+      RIGHT JOIN projects proj ON projTech."projectId" = proj."id"
     WHERE proj."id" = $1;
   `;
-  console.log("laisa", queryString);
-  
   const queryResult: QueryResult<IProjectTechnologies> =
     await client.query<IProjectTechnologies>(queryString, [id]);
-console.log("flavia");
-console.log(queryResult);
-
 
   return res.status(200).json(queryResult.rows);
 };
@@ -264,8 +257,8 @@ const createTechnology = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
-  const id: number = parseInt(req.params.id);
-  const date: Date = new Date();
+  const id = parseInt(req.params.id);
+  const date = new Date();
   const techId: IProjetcTechnology = {
     addedIn: date,
     projectId: id,
@@ -285,8 +278,8 @@ const createTechnology = async (
   await client.query(queryString);
   const addTechnology: string = `
     SELECT
-      tech."id" AS "technologyId",
-      tech."name" AS "technologyName",
+      tec."id" AS "technologyId",
+      tec."name" AS "technologyName",
       proj."id" AS "projectId",
       proj."description" AS "projectDescription",
       proj. "estimatedTime" AS "projectEstimatedTime",
