@@ -142,7 +142,6 @@ const createInfo = async (req: Request, res: Response): Promise<Response> => {
       };
 ​
       if (infoData.preferredOS !== "Windows" || "Linux" || "MacOS") {
-        console.log("flavia");
 ​
         return res.status(400).json({
           message: "Invalid OS option.",
@@ -201,12 +200,8 @@ const listProjects = async (req: Request, res: Response): Promise<Response> => {
       RIGHT JOIN projects proj ON projtec."projectId" = proj."id"
   WHERE proj."id" = $1;
 `;
-  console.log("laisa", queryString);
-​
   const queryResult: QueryResult<IProjectTechnologies> =
     await client.query<IProjectTechnologies>(queryString, [id]);
-  console.log("flavia");
-  console.log(queryResult);
 ​
   return res.status(200).json(queryResult.rows);
 };
@@ -313,15 +308,12 @@ const createTechnology = async (
 ​
   return res.status(201).json(queryResult.rows[0]);
 };
-​
 const deleteTechnology = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
   const id: number = parseInt(req.params.id);
   const techId: number = Number(res.locals.queryResultt);
-  console.log(techId);
-​
   const queryString: string = `
   DELETE FROM
       projects_technologies pt 
